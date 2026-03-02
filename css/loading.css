@@ -1,0 +1,223 @@
+/* ============================================
+   RMaDSD-Balu // Cinematic Boot Screen Styles
+   ============================================ */
+
+/* Hide main content during boot sequence */
+html.boot-active body > *:not(#boot-screen) {
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+/* Transition for main content reveal */
+body > *:not(#boot-screen) {
+    transition: opacity 0.8s ease;
+}
+
+/* --- Boot Screen Overlay --- */
+#boot-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    background: var(--bg-primary, #0a0a0f);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+#boot-screen.boot-fade-out {
+    opacity: 0;
+    transform: scale(1.02);
+    pointer-events: none;
+}
+
+/* --- Boot Scanlines --- */
+.boot-scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.04) 0px,
+        rgba(0, 0, 0, 0.04) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* --- Boot Content Container --- */
+.boot-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    max-width: 480px;
+    width: 90%;
+    padding: 2rem;
+}
+
+/* --- Boot Logo SVG --- */
+.boot-logo {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.boot-logo-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.boot-ring {
+    stroke: var(--accent-primary, #00e5ff);
+    fill: none;
+    filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.5));
+}
+
+.boot-ring-3 {
+    animation: boot-spin 8s linear infinite;
+    transform-origin: 60px 60px;
+    opacity: 0.5;
+}
+
+.boot-ring-2 {
+    animation: boot-spin-rev 5s linear infinite;
+    transform-origin: 60px 60px;
+    opacity: 0.75;
+}
+
+.boot-ring-1 {
+    animation: boot-spin 3s linear infinite;
+    transform-origin: 60px 60px;
+}
+
+.boot-hex {
+    stroke: var(--accent-primary, #00e5ff);
+    fill: rgba(0, 229, 255, 0.04);
+    filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.4));
+    animation: boot-pulse 2s ease-in-out infinite;
+}
+
+.boot-core {
+    fill: var(--accent-primary, #00e5ff);
+    filter: drop-shadow(0 0 8px #00e5ff);
+    animation: boot-pulse 1.5s ease-in-out infinite;
+}
+
+.boot-spoke {
+    stroke: var(--accent-primary, #00e5ff);
+    opacity: 0.35;
+}
+
+@keyframes boot-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes boot-spin-rev {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+}
+
+@keyframes boot-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* --- Boot Text Sequence --- */
+.boot-text-sequence {
+    width: 100%;
+    font-family: var(--font-mono, 'Share Tech Mono', monospace);
+    font-size: 0.85rem;
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.boot-line {
+    color: var(--accent-primary, #00e5ff);
+    text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+    opacity: 0;
+    animation: boot-line-in 0.4s ease forwards;
+    letter-spacing: 0.5px;
+}
+
+.boot-line:last-child {
+    color: var(--status-online, #00ff88);
+    text-shadow: 0 0 10px #00ff88;
+}
+
+@keyframes boot-line-in {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* --- Progress Bar --- */
+.boot-progress-wrap {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.boot-progress-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(0, 229, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.1);
+}
+
+.boot-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-primary, #00e5ff), #ff3355);
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+    border-radius: 2px;
+    transition: width 0.1s linear;
+}
+
+.boot-percentage {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent-primary, #00e5ff);
+    text-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+    min-width: 4.5rem;
+    text-align: right;
+    animation: boot-flicker 0.12s ease-in-out infinite;
+}
+
+@keyframes boot-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.9; }
+}
+
+/* --- Final Text --- */
+.boot-final {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--status-online, #00ff88);
+    text-shadow: 0 0 15px #00ff88, 0 0 30px rgba(0, 255, 136, 0.3);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    text-align: center;
+}
+
+.boot-final.visible {
+    opacity: 1;
+}
