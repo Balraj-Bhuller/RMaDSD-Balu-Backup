@@ -1,0 +1,80 @@
+@keyframes scanline {
+    0% { top: -4px; }
+    100% { top: 100%; }
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+@keyframes pulse-glow {
+    0%, 100% { text-shadow: 0 0 4px rgba(0,229,255,0.6); }
+    50% { text-shadow: 0 0 12px rgba(0,229,255,1), 0 0 20px rgba(0,229,255,0.4); }
+}
+
+@keyframes text-flicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.8; }
+    94% { opacity: 1; }
+    95% { opacity: 0.7; }
+    96% { opacity: 1; }
+}
+
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+@keyframes rotate-slow {
+    from { transform: rotate(45deg); }
+    to { transform: rotate(405deg); }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(15px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes typeIn {
+    from { opacity: 0; transform: translateX(-5px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes border-pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(0,229,255,0.05), inset 0 0 10px rgba(0,229,255,0.02); }
+    50% { box-shadow: 0 0 20px rgba(0,229,255,0.15), inset 0 0 20px rgba(0,229,255,0.04); }
+}
+
+@keyframes glow-text {
+    0%, 100% { text-shadow: 0 0 10px rgba(0,229,255,0.5), 0 0 20px rgba(0,229,255,0.2); }
+    50% { text-shadow: 0 0 20px rgba(0,229,255,0.8), 0 0 40px rgba(0,229,255,0.4), 0 0 60px rgba(0,229,255,0.2); }
+}
+
+/* --- Terminal overlay animations --- */
+@keyframes terminalLineIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes terminalFade {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+/* --- Section page reveal animation --- */
+@keyframes sectionFadeIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
