@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RMaDSD-Balu // Command Interface</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/loading.css">
+</head>
+<body>
+    <!-- Boot / Loading Screen -->
+    <div id="boot-screen">
+        <div class="boot-scanlines"></div>
+        <div class="boot-content">
+            <div class="boot-logo">
+                <svg class="boot-logo-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                    <circle class="boot-ring boot-ring-3" cx="60" cy="60" r="54" stroke-width="1" stroke-dasharray="8 6"/>
+                    <circle class="boot-ring boot-ring-2" cx="60" cy="60" r="42" stroke-width="1.5" stroke-dasharray="12 4"/>
+                    <circle class="boot-ring boot-ring-1" cx="60" cy="60" r="30" stroke-width="2" stroke-dasharray="20 6"/>
+                    <polygon class="boot-hex" points="60,44 73,51.5 73,68.5 60,76 47,68.5 47,51.5" stroke-width="1.5"/>
+                    <line class="boot-spoke" x1="60" y1="30" x2="60" y2="44" stroke-width="1"/>
+                    <line class="boot-spoke" x1="60" y1="76" x2="60" y2="90" stroke-width="1"/>
+                    <line class="boot-spoke" x1="30" y1="60" x2="47" y2="60" stroke-width="1"/>
+                    <line class="boot-spoke" x1="73" y1="60" x2="90" y2="60" stroke-width="1"/>
+                    <circle class="boot-core" cx="60" cy="60" r="5"/>
+                </svg>
+            </div>
+            <div class="boot-text-sequence" id="boot-text-sequence"></div>
+            <div class="boot-progress-wrap">
+                <div class="boot-progress-bar">
+                    <div class="boot-progress-fill" id="boot-progress-fill"></div>
+                </div>
+                <span class="boot-percentage" id="boot-percentage">0%</span>
+            </div>
+            <div class="boot-final" id="boot-final">RMaDSD // SYSTEM ONLINE</div>
+        </div>
+    </div>
+
+    <!-- Scan-line overlay -->
+    <div class="scanline-overlay"></div>
+
+    <!-- Particle canvas background -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <!-- Back Button: hidden on default section, shown inside nav when on other sections -->
+            <button class="back-btn hidden" id="back-btn" aria-label="Return to Mission Briefing">
+                ◄ RETURN TO BASE
+            </button>
+            <div class="nav-logo">
+                <span class="logo-bracket">[</span>
+                <span class="logo-text">RMaDSD</span>
+                <span class="logo-bracket">]</span>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#mission-briefing" class="nav-link active" data-section="mission-briefing">MISSION BRIEFING</a></li>
+            <li><a href="#arsenal"          class="nav-link"        data-section="arsenal">ARSENAL &amp; RESOURCES</a></li>
+            <li><a href="#field-operations" class="nav-link"        data-section="field-operations">FIELD OPERATIONS</a></li>
+            <li><a href="#mission-debrief"  class="nav-link"        data-section="mission-debrief">MISSION DEBRIEF</a></li>
+        </ul>
+        <div class="nav-right">
+            <div class="nav-status">
+                <span class="status-indicator online"></span>
+                <span class="status-text">UPLINK ACTIVE</span>
+            </div>
+            <!-- Hamburger: visible on mobile only -->
+            <button class="hamburger-btn" id="hamburger-btn" aria-label="Open navigation menu">☰</button>
+        </div>
+    </nav>
+
+    <!-- Mobile Nav Overlay (dim background) -->
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+
+    <!-- Mobile Slide-In Nav Panel -->
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
+        <div class="mobile-nav-header">
+            <span class="mobile-nav-logo">[ RMaDSD ]</span>
+            <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close navigation">✕</button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="#mission-briefing" class="mobile-nav-link" data-section="mission-briefing">MISSION BRIEFING</a></li>
+            <li><a href="#arsenal"          class="mobile-nav-link" data-section="arsenal">ARSENAL &amp; RESOURCES</a></li>
+            <li><a href="#field-operations" class="mobile-nav-link" data-section="field-operations">FIELD OPERATIONS</a></li>
+            <li><a href="#mission-debrief"  class="mobile-nav-link" data-section="mission-debrief">MISSION DEBRIEF</a></li>
+        </ul>
+    </nav>
+
+    <!-- Terminal Loading Overlay -->
+    <div class="terminal-overlay" id="terminal-overlay" aria-hidden="true">
+        <div class="terminal-window">
+            <div class="terminal-win-header">
+                <div class="terminal-win-dots">
+                    <span></span><span></span><span></span>
+                </div>
+                <span class="terminal-win-title">// SECURE CHANNEL</span>
+            </div>
+            <div class="terminal-body" id="terminal-body"></div>
+        </div>
+    </div>
+
+    <!-- ======================================================
+         SECTION PAGES
+         Each section is hidden by default; navigation.js
+         adds the .active class to show the current section.
+         ====================================================== -->
+    <main class="sections-container">
+
+        <!-- ══════════════════════════════════════════
+             SECTION 1: MISSION BRIEFING (Default)
+             ══════════════════════════════════════════ -->
+        <section class="section-page" id="section-mission-briefing">
+            <div class="section-header">
+                <div class="section-title-bar">
+                    <span class="section-icon">◆</span>
+                    <h1 class="section-title">MISSION BRIEFING</h1>
+                    <span class="section-status">// ACTIVE</span>
+                </div>
+                <!-- EDIT: Update the subtitle below -->
+                <div class="section-subtitle">Project Overview &amp; Objectives</div>
+            </div>
+
+            <div class="section-body">
+
+                <!-- Hero -->
+                <div class="mission-hero">
+                    <!-- EDIT: Replace the title text with your project name -->
+                    <h2 class="mission-hero-title glitch-text" data-text="RMaDSD INTERFACE">RMaDSD INTERFACE</h2>
+                    <!-- EDIT: Replace the paragraph below with your project overview -->
+                    <p class="mission-hero-text">Add your project description here. Describe what this project is, what it does, and why it matters. This is the first thing visitors will read.</p>
+                </div>
+
+                <!-- Featured Media Placeholder -->
+                <!-- EDIT: Replace this div with <img src="your-image.jpg" alt="Project"> or a video embed -->
+                <div class="media-placeholder featured-media">
+                    <span class="media-placeholder-text">[ INSERT IMAGE ]</span>
+                    <span class="media-placeholder-sub">Replace with your featured project image</span>
+                </div>
+
+                <!-- Mission Objectives -->
+                <div class="section-block">
+                    <div class="block-header">
+                        <span class="block-icon">◆</span>
+                        <h3 class="block-title">MISSION OBJECTIVES</h3>
+                    </div>
+                    <!-- EDIT: Replace these list items with your actual project goals -->
+                    <ul class="hud-list">
+                        <li class="hud-list-item"><span class="hud-bullet">▶</span>Objective 1 — Add your first goal here</li>
+                        <li class="hud-list-item"><span class="hud-bullet">▶</span>Objective 2 — Add your second goal here</li>
+                        <li class="hud-list-item"><span class="hud-bullet">▶</span>Objective 3 — Add your third goal here</li>
+                        <li class="hud-list-item"><span class="hud-bullet">▶</span>Objective 4 — Add your fourth goal here</li>
+                    </ul>
+                </div>
+
+                <!-- Mission Parameters Info Grid -->
+                <div class="section-block">
+                    <div class="block-header">
+                        <span class="block-icon">◆</span>
+                        <h3 class="block-title">MISSION PARAMETERS</h3>
+                    </div>
+                    <!-- EDIT: Update each value cell with your project details -->
+                    <div class="info-grid">
+                        <div class="info-cell">
+                            <span class="info-label">PROJECT DATE</span>
+                            <span class="info-value">2024</span>
+                        </div>
+                        <div class="info-cell">
+                            <span class="info-label">TEAM</span>
+                            <span class="info-value">SOLO / TEAM NAME</span>
+                        </div>
+                        <div class="info-cell">
+                            <span class="info-label">STATUS</span>
+                            <span class="info-value info-online">ACTIVE</span>
+                        </div>
+                        <div class="info-cell">
+                            <span class="info-label">CLASSIFICATION</span>
+                            <span class="info-value">PROJECT</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /section-body -->
+        </section><!-- /section-mission-briefing -->
+
+
+        <!-- ══════════════════════════════════════════
+             SECTION 2: ARSENAL & RESOURCES
+             ══════════════════════════════════════════ -->
+        <section class="section-page" id="section-arsenal">
+            <div class="section-header">
+                <div class="section-title-bar">
+                    <span class="section-icon">◆</span>
+                    <h1 class="section-title">ARSENAL &amp; RESOURCES</h1>
+                    <span class="section-status">// ACTIVE</span>
+                </div>
+                <!-- EDIT: Update the subtitle below -->
+                <div class="section-subtitle">Materials, Tools &amp; Components Deployed</div>
+            </div>
+
+            <div class="section-body">
+
+                <!-- EDIT: Replace each card below with your actual tools/materials/resources -->
+                <div class="arsenal-grid">
+
+                    <!-- Card 1 -->
+                    <div class="arsenal-card">
+                        <!-- EDIT: Replace [ICON] with an <img> or emoji/SVG icon -->
+                        <div class="card-icon-placeholder">[ ICON ]</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Tool / Material Name</h3>
+                            <p class="card-desc">Add a description of this tool or material and how it was used in the project.</p>
+                            <span class="card-tag">HARDWARE</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="arsenal-card">
+                        <div class="card-icon-placeholder">[ ICON ]</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Tool / Material Name</h3>
+                            <p class="card-desc">Add a description of this tool or material and how it was used in the project.</p>
+                            <span class="card-tag">SOFTWARE</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="arsenal-card">
+                        <div class="card-icon-placeholder">[ ICON ]</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Tool / Material Name</h3>
+                            <p class="card-desc">Add a description of this tool or material and how it was used in the project.</p>
+                            <span class="card-tag">COMPONENT</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="arsenal-card">
+                        <div class="card-icon-placeholder">[ ICON ]</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Tool / Material Name</h3>
+                            <p class="card-desc">Add a description of this tool or material and how it was used in the project.</p>
+                            <span class="card-tag">RESOURCE</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 5 -->
+                    <div class="arsenal-card">
+                        <div class="card-icon-placeholder">[ ICON ]</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Tool / Material Name</h3>
+                            <p class="card-desc">Add a description of this tool or material and how it was used in the project.</p>
+                            <span class="card-tag">HARDWARE</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 6 -->
+                    <div class="arsenal-card">
+                        <div class="card-icon-placeholder">[ ICON ]</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Tool / Material Name</h3>
+                            <p class="card-desc">Add a description of this tool or material and how it was used in the project.</p>
+                            <span class="card-tag">SOFTWARE</span>
+                        </div>
+                    </div>
+
+                </div><!-- /arsenal-grid -->
+
+            </div><!-- /section-body -->
+        </section><!-- /section-arsenal -->
+
+
+        <!-- ══════════════════════════════════════════
+             SECTION 3: FIELD OPERATIONS
+             ══════════════════════════════════════════ -->
+        <section class="section-page" id="section-field-operations">
+            <div class="section-header">
+                <div class="section-title-bar">
+                    <span class="section-icon">◆</span>
+                    <h1 class="section-title">FIELD OPERATIONS</h1>
+                    <span class="section-status">// ACTIVE</span>
+                </div>
+                <!-- EDIT: Update the subtitle below -->
+                <div class="section-subtitle">Build Process &amp; Mission Log</div>
+            </div>
+
+            <div class="section-body">
+
+                <!-- EDIT: Add, remove or edit timeline entries below -->
+                <div class="ops-timeline">
+
+                    <!-- Entry 1 -->
+                    <div class="ops-entry">
+                        <div class="ops-timestamp">
+                            <!-- EDIT: Replace with actual date/phase -->
+                            <span class="ops-date">PHASE 01</span>
+                            <span class="ops-time">2024-01-01</span>
+                        </div>
+                        <div class="ops-connector">
+                            <div class="ops-node"></div>
+                            <div class="ops-line"></div>
+                        </div>
+                        <div class="ops-content">
+                            <!-- EDIT: Replace title and description -->
+                            <h3 class="ops-title">Phase / Step Title</h3>
+                            <p class="ops-desc">Describe what happened during this phase. What did you build, design, test, or decide? Add as much detail as you like.</p>
+                            <!-- EDIT: Replace this div with <img src="your-image.jpg" alt="Phase 1"> -->
+                            <div class="media-placeholder ops-media">
+                                <span class="media-placeholder-text">[ INSERT IMAGE ]</span>
+                                <span class="media-placeholder-sub">Add an image or screenshot for this phase</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Entry 2 -->
+                    <div class="ops-entry">
+                        <div class="ops-timestamp">
+                            <span class="ops-date">PHASE 02</span>
+                            <span class="ops-time">2024-02-01</span>
+                        </div>
+                        <div class="ops-connector">
+                            <div class="ops-node"></div>
+                            <div class="ops-line"></div>
+                        </div>
+                        <div class="ops-content">
+                            <h3 class="ops-title">Phase / Step Title</h3>
+                            <p class="ops-desc">Describe what happened during this phase. What challenges did you face? How did you solve them?</p>
+                            <div class="media-placeholder ops-media">
+                                <span class="media-placeholder-text">[ INSERT IMAGE ]</span>
+                                <span class="media-placeholder-sub">Add an image or screenshot for this phase</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Entry 3 -->
+                    <div class="ops-entry">
+                        <div class="ops-timestamp">
+                            <span class="ops-date">PHASE 03</span>
+                            <span class="ops-time">2024-03-01</span>
+                        </div>
+                        <div class="ops-connector">
+                            <div class="ops-node"></div>
+                            <div class="ops-line"></div>
+                        </div>
+                        <div class="ops-content">
+                            <h3 class="ops-title">Phase / Step Title</h3>
+                            <p class="ops-desc">Describe what happened during this phase. What did you learn or accomplish?</p>
+                            <div class="media-placeholder ops-media">
+                                <span class="media-placeholder-text">[ INSERT IMAGE ]</span>
+                                <span class="media-placeholder-sub">Add an image or screenshot for this phase</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Entry 4 -->
+                    <div class="ops-entry">
+                        <div class="ops-timestamp">
+                            <span class="ops-date">PHASE 04</span>
+                            <span class="ops-time">2024-04-01</span>
+                        </div>
+                        <div class="ops-connector">
+                            <div class="ops-node"></div>
+                            <!-- No line after last entry -->
+                        </div>
+                        <div class="ops-content">
+                            <h3 class="ops-title">Phase / Step Title</h3>
+                            <p class="ops-desc">Describe the final phase of your build process. What was the result?</p>
+                            <div class="media-placeholder ops-media">
+                                <span class="media-placeholder-text">[ INSERT IMAGE ]</span>
+                                <span class="media-placeholder-sub">Add an image or screenshot for this phase</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /ops-timeline -->
+
+            </div><!-- /section-body -->
+        </section><!-- /section-field-operations -->
+
+
+        <!-- ══════════════════════════════════════════
+             SECTION 4: MISSION DEBRIEF
+             ══════════════════════════════════════════ -->
+        <section class="section-page" id="section-mission-debrief">
+            <div class="section-header">
+                <div class="section-title-bar">
+                    <span class="section-icon">◆</span>
+                    <h1 class="section-title">MISSION DEBRIEF</h1>
+                    <span class="section-status">// ACTIVE</span>
+                </div>
+                <!-- EDIT: Update the subtitle below -->
+                <div class="section-subtitle">Final Result &amp; Project Showcase</div>
+            </div>
+
+            <div class="section-body">
+
+                <!-- Hero Showcase -->
+                <div class="section-block">
+                    <div class="block-header">
+                        <span class="block-icon">◆</span>
+                        <h3 class="block-title">FINAL RESULT</h3>
+                    </div>
+                    <!-- EDIT: Replace this placeholder with your main showcase image/video -->
+                    <div class="media-placeholder debrief-hero-media">
+                        <span class="media-placeholder-text">[ INSERT FINAL PROJECT IMAGE ]</span>
+                        <span class="media-placeholder-sub">Replace with your hero showcase image or video embed</span>
+                    </div>
+                </div>
+
+                <!-- Outcomes Summary -->
+                <div class="section-block">
+                    <div class="block-header">
+                        <span class="block-icon">◆</span>
+                        <h3 class="block-title">OUTCOMES &amp; RESULTS</h3>
+                    </div>
+                    <!-- EDIT: Update these outcome cards with your actual results/metrics -->
+                    <div class="outcomes-grid">
+                        <div class="outcome-card">
+                            <span class="outcome-value">100%</span>
+                            <span class="outcome-label">Add a metric or result</span>
+                        </div>
+                        <div class="outcome-card">
+                            <span class="outcome-value">✓</span>
+                            <span class="outcome-label">Goal achieved description</span>
+                        </div>
+                        <div class="outcome-card">
+                            <span class="outcome-value">+X</span>
+                            <span class="outcome-label">Another result or achievement</span>
+                        </div>
+                        <div class="outcome-card">
+                            <span class="outcome-value">A+</span>
+                            <span class="outcome-label">Rating / grade / feedback</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gallery Grid -->
+                <div class="section-block">
+                    <div class="block-header">
+                        <span class="block-icon">◆</span>
+                        <h3 class="block-title">GALLERY</h3>
+                    </div>
+                    <!-- EDIT: Replace each placeholder with your gallery images -->
+                    <div class="gallery-grid">
+                        <div class="media-placeholder gallery-item">
+                            <span class="media-placeholder-text">[ IMAGE ]</span>
+                        </div>
+                        <div class="media-placeholder gallery-item">
+                            <span class="media-placeholder-text">[ IMAGE ]</span>
+                        </div>
+                        <div class="media-placeholder gallery-item">
+                            <span class="media-placeholder-text">[ IMAGE ]</span>
+                        </div>
+                        <div class="media-placeholder gallery-item">
+                            <span class="media-placeholder-text">[ IMAGE ]</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Final Notes -->
+                <div class="section-block">
+                    <div class="block-header">
+                        <span class="block-icon">◆</span>
+                        <h3 class="block-title">FINAL NOTES</h3>
+                    </div>
+                    <!-- EDIT: Replace this text with your conclusions, reflections, or next steps -->
+                    <div class="final-notes">
+                        <p>Add your final thoughts, conclusions, lessons learned, and any next steps here. What would you do differently? What are you most proud of?</p>
+                    </div>
+                </div>
+
+            </div><!-- /section-body -->
+        </section><!-- /section-mission-debrief -->
+
+    </main>
+
+    <!-- Bottom Stats Bar -->
+    <footer class="bottom-bar">
+        <div class="bottom-stat">
+            <span class="bottom-label">UPLINK</span>
+            <span class="bottom-value counter" data-target="98.7" data-suffix="%">0%</span>
+        </div>
+        <div class="bottom-stat">
+            <span class="bottom-label">NODES</span>
+            <span class="bottom-value counter" data-target="2847">0</span>
+        </div>
+        <div class="bottom-stat">
+            <span class="bottom-label">LATENCY</span>
+            <span class="bottom-value counter" data-target="12" data-suffix="ms">0ms</span>
+        </div>
+        <div class="bottom-stat">
+            <span class="bottom-label">BANDWIDTH</span>
+            <span class="bottom-value counter" data-target="847" data-suffix=" TB/s">0 TB/s</span>
+        </div>
+        <div class="bottom-stat">
+            <span class="bottom-label">ENCRYPTION</span>
+            <span class="bottom-value">AES-512</span>
+        </div>
+        <div class="bottom-stat">
+            <span class="bottom-label">SESSION</span>
+            <span class="bottom-value" id="session-time">00:00:00</span>
+        </div>
+    </footer>
+
+    <script src="js/loading.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/navigation.js"></script>
+</body>
+</html>
